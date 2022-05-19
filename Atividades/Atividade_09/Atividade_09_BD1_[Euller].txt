@@ -1,0 +1,131 @@
+/* 
+
+Nome: Euller Henrique Bandeira Oliveira
+Matrícula: 11821BSI210
+
+*/
+
+CREATE SCHEMA Universidade;
+
+SET search_path TO Universidade;
+
+/* 	
+
+	Disciplina = { NumDisp, Nome, QuantCreditos }
+	
+*/
+
+CREATE TABLE disciplina (
+	
+	num_disp smallint NOT NULL CONSTRAINT valor_positivo_disciplina CHECK (num_disp > 0),
+	nome varchar(100) NOT NULL DEFAULT 'Banco De Dados 1',
+	quant_creditos smallint NOT NULL DEFAULT 60,
+	CONSTRAINT disciplina_pk PRIMARY KEY (num_disp)
+
+);	
+
+
+/* 
+
+	Professor = { NumFunc, Nome, Admissao, AreaPesquisa }
+
+*/
+
+CREATE TABLE professor (
+	
+	num_func smallint NOT NULL CONSTRAINT valor_positivo_professor CHECK (num_func > 0),
+	nome varchar(100) NOT NULL, 
+	admissao date NOT NULL DEFAULT to_date('2010-01-01', 'AAAA-MM-DD'), 
+	area_pesquisa varchar(50) NOT NULL DEFAULT 'Banco De Dados',
+	CONSTRAINT professor_pk PRIMARY KEY (num_func)
+
+);	
+
+
+/*
+
+	Curso = { NumCurso, Nome, TotalCréditos }
+	
+*/
+
+CREATE TABLE curso (
+	
+	num_curso smallint NOT NULL CONSTRAINT valor_positivo CHECK (num_curso > 0),
+	nome varchar(100) NOT NULL DEFAULT 'Sistemas De Informação',
+	total_creditos smallint NOT NULL DEFAULT 3000,
+	CONSTRAINT curso_pk PRIMARY KEY (num_curso)
+	
+);	
+
+
+/* 
+
+	Aluno = { NumAluno, Nome, Endereco, Cidade, Telefone,
+ 	NumCurso(Curso.NumCurso) }
+
+*/
+
+CREATE TABLE aluno (
+	
+	num_aluno smallint NOT NULL CONSTRAINT valor_positivo_num_aluno CHECK (num_aluno > 0),
+	nome varchar(100) NOT NULL DEFAULT 'Euller',
+	endereco varchar(200) NOT NULL, 
+	cidade varchar(50) NOT NULL DEFAULT 'Uberlândia',
+	telefone varchar(20) NOT NULL,
+	num_curso smallint NOT NULL CONSTRAINT valor_positivo_num_curso CHECK (num_curso > 0),
+	CONSTRAINT aluno_pk PRIMARY KEY (num_aluno),
+	CONSTRAINT aluno_fk FOREIGN KEY (num_curso) REFERENCES curso(num_curso)
+
+);	
+
+/*
+
+	Aula = { NumAluno(Aluno.NumAluno), NumDisp(Disciplina.NumDisp),
+ 	NumFunc(Professor.NumFunc), Semestre, Nota }
+
+*/
+
+CREATE TABLE aula (
+	
+	num_aluno smallint NOT NULL CONSTRAINT valor_positivo_num_aluno CHECK (num_aluno > 0),
+	num_disp smallint NOT NULL CONSTRAINT valor_positivo_num_disp CHECK (num_disp > 0),
+	num_func smallint NOT NULL CONSTRAINT valor_positivo_num_func CHECK (num_func > 0),
+	semestre smallint NOT NULL, 
+	nota smallint NOT NULL,
+	CONSTRAINT aula_pk PRIMARY KEY (num_aluno, num_disp, num_func),
+	CONSTRAINT aluno_fk FOREIGN KEY(num_aluno) REFERENCES aluno(num_aluno)
+	ON UPDATE NO ACTION ON DELETE NO ACTION,
+	CONSTRAINT disciplina_fk FOREIGN KEY (num_disp) REFERENCES disciplina(num_disp)
+	ON UPDATE NO ACTION ON DELETE NO ACTION,
+	CONSTRAINT professor_fk FOREIGN KEY (num_func) REFERENCES professor(num_func)
+	ON UPDATE NO ACTION ON DELETE NO ACTION
+);	
+
+/*
+
+	DisciplinaCurso = { NumDisp(Disciplina.NumDisp), NumCurso(Curso.NumCurso) }
+	
+*/
+
+CREATE TABLE disciplina_curso (
+	
+	num_disp smallint NOT NULL CONSTRAINT valor_positivo_num_discplina CHECK (num_disp > 0),
+	num_curso smallint NOT NULL CONSTRAINT valor_positivo_num_curso CHECK (num_curso > 0),
+	CONSTRAINT d_c_pk PRIMARY KEY (num_disp, num_curso),
+	CONSTRAINT disciplina_fk FOREIGN KEY (num_disp) REFERENCES disciplina(num_disp),
+	CONSTRAINT curso_fk FOREIGN KEY (num_curso) REFERENCES curso(num_curso)
+	ON UPDATE NO ACTION ON DELETE NO ACTION
+);	
+
+ALTER TABLE disciplina ALTER nome SET DEFAULT 'Banco de dados 2';
+
+
+ALTER TABLE professor ALTER area_pesquisa SET DEFAULT 'Programação lógica';
+
+
+ALTER TABLE curso ALTER nome SET DEFAULT 'Sistemas Operacionais';
+
+
+
+
+

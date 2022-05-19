@@ -1,0 +1,36 @@
+3. Discuta as vantagens de um SGBD quando comparado com um sistema de arquivos.
+
+
+  Controle da redundância
+    
+    Ao utilizar um sistema de arquivos, redudâncias ocorrem quando dois grupos armazenam informações repetidas. Por exemplo, o departamento de RH armazena o CPF, o nome e o telefone, já o departamento de TI armazena o CPF, o email e a senha. Como é possível notar, o CPF será armazenado duas vezes. Tal redundância causa: duplicação de esforço (Toda vez que um departamento inserir, atualizar ou remover algum dado, o outro departamento deve repetir o que foi feito), desperdicio de espaço de armazenamento (Ao adicionar um dado no arquivo de um departamento, o outro departamento terá que inserir um novo dado em seu arquivo) e inconsistências (Se um usuário de um departamento cometer um equivoco ao inserir o dado recebido do outro departamento, os arquivos ficarão incosistentes).
+ 
+    Restrige o acesso ao banco de dados/dados específicos/comandos específicos
+    
+        Ao utilizar um SGDB, pode-se configurar contas que podem controlar todo o banco de dados, configuras contas que podem controlar somente alguns dados, que podem executar somente alguns comandos (buscar, adicionar, atualizar ou remover).
+
+    Impõe restriçoes de integridade
+    
+        O SGDB permite que várias restrições de integridade sejam feitas. 
+        Por exemplo: Especificar o tipo de um dado
+                     Especificar que(s) valor(es) um dado pode receber
+                     Especificar que um registro deve se relacionar a outro registro (Restrição de integridade relacional) 
+                     Especificar que cada registro deve ter um id único (Restrição de chave) 
+
+    Potencial para garantir padrões
+        
+        O uso do SGDB permite que padrões para o armazenamento de dados sejam criados. Tal padronização facilita bastante o armazenamento e a consulta ao banco de dados para os usuários, projetos e departamentos. 
+    
+            
+
+    
+    
+        
+
+
+
+                            Fonte Bibliográfica
+
+            Elmasri, Ramez; Navathe, Shamkant B. Sistemas de banco de
+            dados. 6 ed. São Paulo: Addison Wesley, 2011, 11-15 p
+

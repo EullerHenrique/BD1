@@ -1,0 +1,161 @@
+Os pacientes são identificados pelo CPF, e seus nomes, endereços e idade devem
+ser registrados. 
+
+Paciente
+	CPF
+	nome
+	endereço
+	idade
+	telefone
+
+Para cada paciente também é necessário armazenar seus
+telefones de contato que podem ser: residencial, comercial e/ou celular.
+
+Os médicos são identificados pelo CRM. Para cada médico, o nome, a
+especialidade e anos de experiência devem ser registrados.
+
+Médico
+	CRM
+	nome
+	especialidade
+	anos_experiencia
+
+Cada empresa farmacêutica é identificada pelo CNPJ e tem um número de
+telefone.
+
+Empresa farmacêutica
+	CNPJ
+	nro_telefone
+
+
+Para cada medicamento, o nome e a fórmula devem ser registrados. 
+
+Cada medicamento é vendido por determinada empresa farmacêutica, e o seu nome o
+identifica univocamente entre os produtos dessa empresa.
+
+<Fabrica>
+
+Medicamento
+	nome
+	fórmula
+
+Se uma empresa farmacêutica é excluída, você não precisa mais manter o controle de seus produtos.
+
+[Medicamento]
+[<Fabrica>]
+
+Cada farmácia tem um nome, endereço e um número de telefone. Cada farmácia
+da rede é identificada pelo seu nome e endereço.
+
+Farmácia
+	nome
+	endereço
+	nro_telefone
+
+
+Todo paciente tem um médico principal. 
+
+	<Possui> (..:1)
+
+Todo médico tem no mínimo um paciente.
+
+	<Possui> (..:m)
+
+Cada farmácia vende diversos medicamentos (..:n)
+
+e tem um preço para cada um. 
+
+<Vende>
+	preço
+
+Um medicamento poderia ser vendido em diversas farmácias (..:m)
+
+
+e o preço pode variar de uma farmácia para outra.
+
+<Vende> 
+	preço
+
+Os médicos prescrevem receitas contendo medicamentos para os pacientes. 
+
+Um médico pode prescrever uma ou mais receitas para diversos pacientes e um
+paciente pode obter prescrições de diversos médicos. (m:n)
+
+Cada prescrição tem uma data e pode conter um ou mais medicamentos associados a ela. 
+
+<Prescreve>
+	data
+
+Você pode assumir que, se um médico prescreve o mesmo medicamento para o mesmo
+paciente mais do que uma vez, apenas a última prescrição precisa ser
+armazenada.
+
+    Portanto, data será um atributo e não uma entidade/tabela.
+
+<Prescre>
+    data
+
+Toda receita tem no mínimo um medicamento.
+
+
+As empresas farmacêuticas têm contratos de longo prazo com as farmácias.
+Uma empresa farmacêutica pode ter contratos com diversas farmácias, e uma farmácia pode ter contrato com diversas empresas farmacêuticas. (m:n)
+
+Para cada contrato, você deve armazenar uma data inicial, uma data final e o texto do contrato.
+
+<Contrata>
+	data_inicial
+	data_final
+	texto
+
+As farmácias indicam um supervisor para cada contrato.
+
+<Contrata>
+	data_inicial
+	data_final
+	texto
+    supervisor
+
+Sempre deve haver um supervisor para cada contrato, mas o supervisor do contrato pode ser alterado durante o tempo de vigência deste. 
+
+Você pode assumir que, se o supervisor de um contrato for alterado durante a sua vigência, apenas o último supervisor precisa ser armazenado.
+
+Portanto, não é preciso que uma tabela, ou seja, uma entidade armazene tais dados.
+
+
+a) Desenhe um diagrama Entidade-Relacionamento que capture as informações precedentes.
+
+Neste diagrama: identifique todos os tipos de restrição que atuam sobre os tipos-entidade e identifique todos os tipos de restrição que atuam sobre os tipos-relacionamentos. 
+
+Discuta todas as considerações feitas por você e justifique suas escolhas.
+
+Participação total 
+
+A participação entre a entidade paciente e a entidade médico é total devido ao fato de que a existência do paciente depende da existência do médico, já que por definição da propria palavra paciente, um paciente precisa de um médico para ser considerado um paciente.
+
+A participação entre a entidade medicamento e a entidade empresa farmacêutica é total devido ao fato de que a existência do medicamento depende da existência da empresa farmacêutica, já que os medicamentos são fabricados pela empresa farmacêutica. 
+
+Entidade fraca 
+
+A entidade medicamento é fraca devido ao fato de que se uma empresa farmacêutica é excluída, não é preciso armazenar os dados dos medicamentos fabricados por ela.
+
+b) Qual alteração seria necessária no diagrama da resolução a) para adequa-lo
+a seguinte situação: cada medicamento deve ser vendido por um preço fixo
+por todas as farmácias.
+
+O atributo preço pertenence ao relacionamento Vende deve ser realocado para 	    a entidade Medicamento. 
+Dessa maneira, cada medicamento terá um preço fixo.
+
+c) Qual alteração seria necessária no diagrama da resolução a) para adequa-lo
+a seguinte situação: se um médico prescreve o mesmo medicamento para o
+mesmo paciente mais do que uma vez, todas as prescrições precisam ser
+armazenadas.
+
+O atributo data pertencente ao relacionamento Prescreve deve ser realocado para a entidade Data e tal relacionamento deve se relacionar com essa entidade. 
+
+Dessa maneira, todas as prescições serão armazenadas por meio da data em que foram realizadas.
+
+É possível modelar essa situação com construções diferentes nos modelos MER e MER-X? Se sim, apresente as duas construções.
+
+
+

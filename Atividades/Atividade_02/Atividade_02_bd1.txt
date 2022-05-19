@@ -1,0 +1,70 @@
+Cliente
+	id -> chave primária
+	nome
+	sexo
+	data_de_nascimento
+	endereço -> atributo composto ?
+	pelo menos um telefone -> atributo multivalorado
+	CPF
+
+
+Sistema 
+	veiculos_disponiveis
+	veiculos_reservados
+	veiculos_alugados
+	
+Veiculo 
+	placa
+	numero_do_chassi
+	numero_do_motor
+	tipo
+	cor
+
+
+Conexão (Veículo-Tipo)
+
+	Veiculo_reservado
+		id
+		cliente
+		data_prevista_para_retirada
+		data_prevista_para_devolução
+		local_de_retirada
+
+Veiculo_alugado
+	id
+	data_prevista_para_devolucao
+
+
+Tipo
+	tamanho
+	numero_de_passageiros
+	numero_de_portas
+	valor_da_diaria_de_locação
+	valor_do_quilomentro_rodado
+	acessorios: true ou false
+
+Conexão (Veiculo-Tipo): 
+
+	Revisao e limpesa
+	
+		numero_de_horas_para_limpesa_e_revisao
+
+
+Seguradora
+	identificacao_do_motorista																																																																																				numero_da_habilitação_do_motorista						data_de_vencimento_do_motorista
+					   
+
+
+
+
+
+
+	
+	
+
+	
+
+
+	
+
+

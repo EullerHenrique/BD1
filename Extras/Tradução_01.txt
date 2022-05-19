@@ -1,0 +1,92 @@
+------------------------------------------------------------------------------------
+
+Visão geral do processamento de consultas
+
+A grande maioria das interações com o SGBD segue o caminho do lado esquerdo da Figura. Um usuário ou um programa aplicativo inicia alguma ação, usando a linguagem de manipulação de dados (DML). Este comando não afeta o esquema do banco de dados, mas pode afetar o conteúdo do banco de dados (se a ação for um comando de modificação) ou irá extrair dados do banco de dados (se o
+ação é uma consulta). As instruções DML são tratadas por dois subsistemas separados, como segue.
+
+Respondendo à Consulta
+
+A consulta é analisada e otimizada por um compilador de consulta. O plano de consulta resultante, ou sequência de ações que o SGDB executará para responder à consulta, é passado para o mecanismo de execução. O mecanismo de execução emite uma sequência de solicitações de pequenos pedaços de dados, normalmente registros ou tuplas de uma relação, para um gerenciador de recursos que conhece os arquivos de dados (relações de manutenção), o formato e o tamanho dos registros nesses arquivos e arquivos de índice, que ajudam a encontrar elementos de arquivos de dados rapidamente.
+
+Os pedidos de dados são passados ​​para o gerenciador de buffer. A tarefa do gerenciador de buffer é trazer porções apropriadas dos dados do armazenamento secundário (disco), onde são mantidos permanentemente, para os buffers da memória principal. Normalmente, a página ou “bloco de disco” é a unidade de transferência entre buffers e disco.
+
+O gerenciador de buffer se comunica com um gerenciador de armazenamento para obter dados do disco. O gerenciador de armazenamento pode envolver comandos do sistema operacional, mas, mais comumente, o RGBD emite comandos diretamente para o controlador de disco.
+
+Processamento de Transação
+
+As consultas e outras ações DML são agrupadas em transações, que são unidades que devem ser executadas atomicamente e isoladas umas das outras. Qualquer consulta
+ou a ação de modificação pode ser uma transação por si só. Além disso, a execução das transações deve ser durável, o que significa que o efeito de qualquer transação concluída deve ser preservado, mesmo se o sistema falhar de alguma forma logo após a conclusão da transação. Dividimos o processador de transações em duas partes principais:
+
+1. Um gerente de controle de simultaneidade, ou agendador, responsável por garantir
+atomicidade e isolamento de transações, e
+2. Um gerente de registro e recuperação, responsável pela durabilidade das transações
+
+------------------------------------------------------------------------------------
+
+
+O Processador de Consulta
+
+A parte do RGBD que mais afeta o desempenho que o usuário vê é o processador de consultas. Na Figura, o processador de consultas é representado por dois
+componentes:
+
+1. 
+    
+    O compilador de consulta, que traduz a consulta em um formulário interno     denominado plano de consulta. O último é uma sequência de operações a serem realizadas nos dados. Freqüentemente, as operações em um plano de consulta são implementações de operações de “álgebra relacional”.
+
+O compilador de consulta consiste em três unidades principais:
+
+    (a) Um analisador de consulta, que constrói uma estrutura em árvore a partir da forma textual da consulta.
+    (b) Um pré-processador de consulta, que realiza verificações semânticas na consulta (por exemplo, certificando-se de que todas as relações mencionadas pela consulta realmente existem) e realizando algumas transformações de árvore para transformar a árvore de análise em uma árvore de operadores algébricos que representam o plano de consulta inicial .
+    (c) Um otimizador de consulta, que transforma o plano de consulta inicial na melhor sequência disponível de operações sobre os dados reais. 
+
+O compilador de consulta usa metadados e estatísticas sobre os dados para decidir qual sequência de operações provavelmente será a mais rápida. Por exemplo, a existência de um índice, que é uma estrutura de dados especializada que facilita o acesso aos dados, dados valores para um ou mais componentes desses dados, pode tornar um plano muito mais rápido do que outro.
+
+2. 
+    O mecanismo de execução, que tem a responsabilidade de executar cada uma das etapas do plano de consulta escolhido. O mecanismo de execução interage com a maioria dos outros componentes do RGBD, diretamente ou por meio
+os buffers. Ele deve obter os dados do banco de dados em buffers para manipular esses dados. Ele precisa interagir com o planejador para evitar o acesso aos dados que estão bloqueados e com o gerenciador de log para se certificar de que
+todas as alterações do banco de dados são registradas corretamente.
+
+
+Processamento de Transação
+
+É normal agrupar uma ou mais operações de banco de dados em uma transação, que é uma unidade de trabalho que deve ser executada atomicamente e em aparente isolamento de outras transações. Além disso, um SGBD oferece a garantia de durabilidade: que o trabalho de uma transação concluída nunca será perdido. O gerenciador de transações, portanto, aceita comandos de transação de um aplicativo, que informam ao gerenciador de transações quando as transações começam e terminam, bem como informações sobre as expectativas do aplicativo (alguns podem não querer exigir atomicidade, por exemplo). 
+
+O processador de transação executa as seguintes tarefas:
+
+1. Registro: Para garantir durabilidade, todas as alterações no banco de dados são registradas separadamente no disco. O gerenciador de log segue uma das várias políticas projetadas para garantir que, independentemente da ocorrência de uma falha ou “travamento” do sistema, um gerenciador de recuperação será capaz de examinar o log de alterações e restaurar o banco de dados a um estado consistente. O gerenciador de log inicialmente escreve o log em buffers e negocia com o gerenciador de buffer para garantir que os buffers sejam gravados no disco (onde os dados podem sobreviver a um travamento) nos momentos apropriados.
+
+2. Controle de simultaneidade: as transações devem parecer executadas isoladamente.
+Mas, na maioria dos sistemas, haverá, na verdade, muitas transações em execução ao mesmo tempo. Assim, o planejador (gerenciador de controle de simultaneidade) deve assegurar que as ações individuais de várias transações sejam executadas de forma que o efeito líquido seja o mesmo como se as transações tivessem de fato sido executadas em sua totalidade, uma a uma Tempo. Um planejador típico faz seu trabalho mantendo bloqueios em certas partes do banco de dados. Esses bloqueios evitam que duas transações acessem a mesma parte dos dados de maneiras que interagem mal. Os bloqueios são geralmente armazenados em uma tabela de bloqueio da memória principal, conforme sugerido pela Fig. 1.1. O planejador afeta a execução de consultas e outras operações do banco de dados, proibindo o mecanismo de execução de acessar partes bloqueadas do banco de dados.
+
+3. Resolução de deadlock: À medida que as transações competem por recursos por meio dos bloqueios que o planejador concede, elas podem entrar em uma situação em que ninguém pode prosseguir porque cada uma precisa de algo que a outra transação tem. O gerenciador de transações tem a responsabilidade de intervir e cancelar (“rollback” ou “abortar”) uma ou mais transações para permitir que as outras prossigam.
+
+
+--------------------------------------------------
+As propriedades ACID das transações
+
+Normalmente, diz-se que as transações implementadas corretamente atendem ao "teste ACID", onde:
+• “A” significa “atomicidade”, a execução de transações do tipo tudo ou nada.
+• “I” significa “isolamento”, o fato de que cada transação deve aparecer
+para ser executado como se nenhuma outra transação estivesse sendo executada ao mesmo tempo.
+• “D” significa “durabilidade”, a condição de que o efeito de uma transação no banco de dados nunca seja perdido, uma vez que a transação seja concluída.
+A letra restante, "C", significa "consistência". Ou seja, todos os bancos de dados têm restrições de consistência ou expectativas sobre relacionamentos entre os elementos de dados (por exemplo, os saldos das contas podem não ser negativos após o término de uma transação). Espera-se que as transações preservem a consistência do banco de dados.
+--------------------------------------------------
+
+
+Gerenciamento de armazenamento e buffer
+
+Os dados de um banco de dados normalmente residem no armazenamento secundário; nos sistemas de computador de hoje, "armazenamento secundário" geralmente significa disco magnético. No entanto, para realizar qualquer operação útil nos dados, esses dados devem estar na memória principal. É função do gerenciador de armazenamento controlar a colocação dos dados no disco e sua movimentação entre o disco e a memória principal.
+Em um sistema de banco de dados simples, o gerenciador de armazenamento pode ser nada mais do que o sistema de arquivos do sistema operacional subjacente. No entanto, para fins de eficiência, o RGBD normalmente controla o armazenamento no disco diretamente, pelo menos em algumas circunstâncias. 
+O gerenciador de armazenamento rastreia a localização dos arquivos no disco e obtém o bloco ou blocos contendo um arquivo a pedido do gerenciador de buffer.
+O gerenciador de buffer é responsável por particionar a memória principal disponível em buffers, que são regiões do tamanho de uma página para as quais os blocos do disco podem ser transferidos. Assim, todos os componentes do RGBD que precisam de informações do disco irá interagir com os buffers e o gerenciador de buffer, diretamente ou por meio do mecanismo de execução. 
+
+Os tipos de informações de que vários componentes podem precisar incluem:
+
+1. Dados: o conteúdo do próprio banco de dados.
+2. Metadados: o esquema do banco de dados que descreve a estrutura e as restrições do banco de dados.
+3. Registros de log: informações sobre alterações recentes no banco de dados; estes suportam a durabilidade do banco de dados.
+4. Estatísticas: informações coletadas e armazenadas pelo SGBD sobre propriedades de dados, como os tamanhos e valores de várias relações ou outros componentes do banco de dados.
+5. Índices: estruturas de dados que suportam acesso eficiente aos dados.
+
+

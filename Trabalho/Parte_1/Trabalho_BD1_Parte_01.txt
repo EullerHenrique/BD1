@@ -1,0 +1,190 @@
+Descrição dos Requisitos de Dados para um Sistema de Monitoramento da
+Vacinação contra a Covid-19
+
+a) O funcionamento básico do sistema de monitoramento da vacinação é o seguinte:
+pacientes podem fazer registro em fila para receber o agendamento para a
+aplicação de uma vacina repeitando as fases de vacinação previstas no plano
+nacional de imunização
+
+b) As vacinas aprovadas pela Anvisa para uso no Brasil são registradas no sistema.
+Para cada vacina aprovada é necessário saber o nome (único), qual é o
+desenvolvedor, país de origem, laboratórios parceiros, eficácia, registro de
+aprovação na Anvisa e data de aprovação do uso.
+
+Vacina 
+    *nome*
+    desenvolvedor
+    país_origem
+    ((labs)) -> Requisito adicional?
+    eficácia
+    registro_anvisa
+    data_aprovação
+
+c) Cada vacina pode necessitar da aplicação de um número diferente de doses para
+garantir proteção contra a doença (por exemplo, 1 dose, 2 doses ou 3 doses).
+
+Além disso, o intervalo recomendado entre uma dose e outra também pode variar
+para cada vacina. Por exemplo, para uma determinada vacina a segunda dose
+deve ser aplicada após 21 dias e para outra vacina a segunda dose deve ser
+aplicada após 90 dias. É preciso registrar o intervalo de aplicação recomendado
+para cada dose de cada vacina.
+
+Vacina 
+    *nome*
+    desenvolvedor
+    país_origem
+    ((labs))
+    eficácia
+    registro_anvisa
+    data_aprovação
+    nro_aplicações
+    intervalo_aplicação
+
+d) As vacinas são adquiridas em lotes. Cada vacina pode possuir vários lotes. Cada
+lote deve pertencer a apenas uma vacina.
+
+Vacina <Possui> Lote (1:n)
+
+e) De cada lote de vacina, é necessário registrar o número do lote, a data de
+fabricação, o prazo de validade, a quantidade de doses, a data de recebimento do
+lote, e o custo por dose. 
+
+O número do lote pode ser usado para distinguir diferentes lotes de uma mesma vacina. Podem existir números de lotes idênticos para vacinas diferentes.
+
+Lote
+    *nro_lote*
+    data_fabricação
+    data_validade
+    data_recebimento    
+    qtd_doses
+    custo_dose
+    
+f) Os lotes de vacina são encaminhados para os locais de aplicação. É preciso
+registrar o nome, o endereço e o telefone dos locais de aplicação das vacinas.
+Cada local de aplicação deve também ser identificado univocamente.
+
+Local de aplicação
+    *id*    
+    nome
+    endereço
+    telefone
+    
+g) Doses de um lote de vacina podem ser encaminhadas para vários locais de
+aplicação. E um local de aplicação pode receber doses de vários lotes de vacinas.
+Para cada lote de vacina encaminhado para um local é preciso saber a data em
+que foi encaminhado e a quantidade de doses do lote encaminhada.
+
+Vacina <Encaminhada> Local de aplicação (m:n)
+    data
+    qtd_doses
+
+h) Também é preciso registrar as fases de vacinação definidas. Para que seja
+possível planejar a vacinação da população é preciso saber sobre cada fase as
+datas inicial e final previstas para a vacinação da fase, a idade mínima para a
+população em geral para receber a vacinação na fase, e as prioridades
+profissionais definidas para a fase (por exemplo, na fase 1 terão prioridade
+profissionais de saúde independentemente da faixa etária). Cada fase é
+identificada por um número (por exemplo, 1, 2, etc.).
+
+
+Fase de vacinação
+    *nro*
+    data_inicial
+    data_final
+    idade_minima
+    profissional_prioritário
+    
+i) É definida uma fila para cada fase da vacinação. Toda fila tem que ser referente a uma fase de vacinação.
+
+Fase de vacinação <Contém> Fila de vacinação (1:1)
+
+
+j) Toda fila de vacinação é identificada por um código e deve possuir uma
+descrição a respeito da ordenação realizada para o recebimento da vacina (por
+exemplo, dentro da fase 1 os profissionais de saúde que trabalham diretamente
+com o tratamento da Covid-19 devem receber a vacinação primeiro, os idosos de
+instituições de longa permanência também devem ser priorizados em relação aos
+outros idosos, etc.)
+    
+    Fila de vacinação
+
+    *id*
+    descrição
+
+k) Também é preciso manter um cadastro tanto dos pacientes que recebem as
+vacinas, quanto dos profissionais de saúde que aplicam as vacinas. Para consultar
+os dados de uma pessoa será necessário informar o CPF da mesma. Para cada
+pessoa é preciso registrar em seu cadastro, CPF, número de cadastro no SUS (se
+houver), nome, endereço, telefones de contato, email, nome do pai e nome da
+mãe (para menores de idade), e data de nascimento. Além disso, para os
+profissionais de saúde é preciso saber o número de registro no COREN e para os
+pacientes a profissão para poder organizar a priorização da vacinação.
+
+Pessoa
+    *CPF*
+    nro_cadastro_sus
+    nome
+    endereço
+    telefone    
+    email
+    nome_pai
+    nome_mae
+    data_nascimento
+
+Paciente
+    profissão
+
+Profissional de saúde
+    nro_coren
+    
+    
+l) Os pacientes são autorizados para se registrarem em uma fila para receber a
+vacina de acordo com as fases de vacinação. É preciso saber a data e a hora em
+que o registro foi feito. Uma fila pode receber a inscrição de vários pacientes.
+
+Paciente <Ingressa> Fila (1:m)
+    data
+    hora
+
+m) A medida que as vacinas vão sendo disponibilizadas para aplicação, os pacientes
+cadastrados nas filas são autorizados para realizar os agendamentos para receber
+doses das vacinas. Um paciente pode ter que realizar vários agendamentos (um
+para cada dose de uma vacina) e um agendamento tem que estar vinculado a um
+paciente.
+
+Paciente na fila <Realiza> Agendamento (m:1)
+
+n) Para cada agendamento é necessário saber seu código identificador, data prevista
+para a aplicação, horário previsto para a aplicação, qual dose (por exemplo,
+primeira, segunda, etc.) e a confirmação se a aplicação foi realizada ou não.
+
+Agendamento
+    *id*
+    data
+    horario
+    dose
+    confirmação
+    
+o) O agendamento tem que ser feito para um local de aplicação específico. Um local
+de aplicação pode receber vários agendamentos.
+
+Agendamento <Tem> Local de aplicação (m:1)
+
+p) Além disso, é preciso registrar qual profissional de saúde atendeu o agendamento
+(ou seja, aplicou a vacina). Um profissional de saúde pode atender vários
+agendamentos e um agendamento pode ser atendido por um profissional de
+saúde.
+
+Profissional de saúde <Atende> Agendamento (1:m)
+
+q) Para cada agendamento é necessário saber a vacina de qual lote foi aplicada.
+Vacinas de um lote podem ser utilizadas para atender vários agendamentos, e um
+agendamento só pode receber uma vacina de um lote.
+
+Agendamento <Utiliza> Lote (m:1)
+
+
+
+
+
+
